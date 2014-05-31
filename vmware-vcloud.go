@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/mitchellh/packer/packer"
+	"io/ioutil"
+	"os"
+	"os/exec"
 	"path/filepath"
-  "os"
-  "os/exec"
-  "io/ioutil"
-  "strings"
+	"strings"
 )
 
 type VMwarevCloudProvider struct{}
@@ -20,34 +20,34 @@ func (p *VMwarevCloudProvider) Process(ui packer.Ui, artifact packer.Artifact, d
 	// Create the metadata
 	metadata = map[string]interface{}{"provider": "vcloud"}
 
-  vmx := ""
-  ovf := ""
-  basepath := ""
-  for _, path := range artifact.Files() {
-    if strings.HasSuffix(path, ".vmx") {
-      vmx = path
-      ovf = filepath.Base(vmx[:len(vmx)-4] + ".ovf")
-      basepath = filepath.Dir(path) + "/ovf"
-    }
-  }
-    
-  // start upload
-  ui.Message(fmt.Sprintf("ovftool is going create an ovf out of %s", vmx))
-  
-  program := "ovftool"
-  sourcetype := "--sourceType=VMX"
-  targettype := "--targetType=OVF"
+	vmx := ""
+	ovf := ""
+	basepath := ""
+	for _, path := range artifact.Files() {
+		if strings.HasSuffix(path, ".vmx") {
+			vmx = path
+			ovf = filepath.Base(vmx[:len(vmx)-4] + ".ovf")
+			basepath = filepath.Dir(path) + "/ovf"
+		}
+	}
 
-  // start upload
-  ui.Message(fmt.Sprintf("this is our ovftool run %s %s %s %s %s", program, sourcetype, targettype, vmx, basepath + "/" + ovf))
+	// start upload
+	ui.Message(fmt.Sprintf("ovftool is going create an ovf out of %s", vmx))
 
-  ui.Message(fmt.Sprintf("Creating directory: %s", basepath))
+	program := "ovftool"
+	sourcetype := "--sourceType=VMX"
+	targettype := "--targetType=OVF"
 
-  if err := os.Mkdir(basepath, 0755); err != nil { 
-    ui.Message(fmt.Sprintf("err: %s", err))
-  } 
+	// start upload
+	ui.Message(fmt.Sprintf("this is our ovftool run %s %s %s %s %s", program, sourcetype, targettype, vmx, basepath+"/"+ovf))
 
-  cmd := exec.Command(program, sourcetype, targettype, vmx, basepath + "/" + ovf)
+	ui.Message(fmt.Sprintf("Creating directory: %s", basepath))
+
+	if err := os.Mkdir(basepath, 0755); err != nil {
+		ui.Message(fmt.Sprintf("err: %s", err))
+	}
+
+	cmd := exec.Command(program, sourcetype, targettype, vmx, basepath+"/"+ovf)
 
 	ui.Message(fmt.Sprintf("Starting ovftool"))
 
@@ -55,18 +55,17 @@ func (p *VMwarevCloudProvider) Process(ui packer.Ui, artifact packer.Artifact, d
 	cmd.Wait()
 
 	ui.Message(fmt.Sprintf("Reading files in %s", basepath))
-  files, _ := ioutil.ReadDir(basepath)
-  for _, path := range files {
-  //         ui.Message(fmt.Sprintf("%s", f.Name()))
-  // }
+	files, _ := ioutil.ReadDir(basepath)
+	for _, path := range files {
+		//         ui.Message(fmt.Sprintf("%s", f.Name()))
+		// }
 
-
-	// Copy all of the original contents into the temporary directory
-	// for _, path := range artifact.Files() {
+		// Copy all of the original contents into the temporary directory
+		// for _, path := range artifact.Files() {
 		ui.Message(fmt.Sprintf("Copying: %s", path.Name()))
 
 		dstPath := filepath.Join(dir, path.Name())
-		if err = CopyContents(dstPath, basepath + "/" + path.Name()); err != nil {
+		if err = CopyContents(dstPath, basepath+"/"+path.Name()); err != nil {
 			return
 		}
 	}
