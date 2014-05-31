@@ -2,7 +2,7 @@
 
 This packer plugin leverages [VMware OVF Tool](http://www.vmware.com/support/developer/ovf) to create a [vagrant-vcloud](https://github.com/frapposelli/vagrant-vcloud) and [vagrant-vcenter](https://github.com/gosddc/vagrant-vcenter) compatible boxes.
 
-This plugin is used to build the boxes available at http://vagrant.gosddc.com/boxes you can find the packer templates at https://github.com/gosddc/packer-templates
+This plugin is used to build the boxes available at https://vagrantcloud.com/gosddc you can find the packer templates at https://github.com/gosddc/packer-templates
 
 ## Prerequisites
 
