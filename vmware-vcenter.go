@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/mitchellh/packer/packer"
+	vmwcommon "github.com/mitchellh/packer/builder/vmware/common"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -29,6 +30,35 @@ func (p *VMwarevCenterProvider) Process(ui packer.Ui, artifact packer.Artifact, 
 			ovf = filepath.Base(vmx[:len(vmx)-4] + ".ovf")
 			basepath = filepath.Dir(path) + "/ovf"
 		}
+	}
+
+	vmxData, err := vmwcommon.ReadVMX(vmx)
+	if err != nil {
+		ui.Message(fmt.Sprintf("err: %s", err))
+	}
+
+	for k, _ := range vmxData {
+		if strings.HasPrefix(k, "floppy0.") {
+			ui.Message(fmt.Sprintf("Deleting key: %s", k))
+			delete(vmxData, k)
+		}
+		if strings.HasPrefix(k, "ide1:0.file") {
+			ui.Message(fmt.Sprintf("Deleting key: %s", k))
+			delete(vmxData, k)
+		}
+	}
+
+	// remove floppy (again)
+	ui.Message(fmt.Sprintf("Setting key: floppy0.present = FALSE"))
+	vmxData["floppy0.present"] = "FALSE"
+
+	// detach DVD (again)
+	ui.Message(fmt.Sprintf("Setting key: ide1:0.present = FALSE"))
+	vmxData["ide1:0.present"] = "FALSE"
+
+	// Rewrite the VMX
+	if err := vmwcommon.WriteVMX(vmx, vmxData); err != nil {
+		ui.Message(fmt.Sprintf("err: %s", err))
 	}
 
 	// start upload

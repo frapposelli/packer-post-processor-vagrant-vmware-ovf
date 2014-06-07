@@ -8,7 +8,7 @@ This plugin is used to build the boxes available at https://vagrantcloud.com/gos
 
 Software:
 
-  * VMware OVF Tool
+  * VMware OVF Tool (```ovftool``` must be in your $PATH)
   
 Notes:
 
