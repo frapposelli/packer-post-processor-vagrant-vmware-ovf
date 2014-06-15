@@ -20,4 +20,4 @@ _cgo_export.*
 _testmain.go
 
 *.exe
-packer-post-process-or-vmware-ovf
+packer-post-processor-vagrant-vmware-ovf
