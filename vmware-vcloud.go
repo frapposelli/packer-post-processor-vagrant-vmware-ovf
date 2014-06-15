@@ -64,7 +64,7 @@ func (p *VMwarevCloudProvider) Process(ui packer.Ui, artifact packer.Artifact, d
 	// start upload
 	ui.Message(fmt.Sprintf("ovftool is going create an ovf out of %s", vmx))
 
-	program := "ovftool"
+	program, err := FindOvfTool()
 	sourcetype := "--sourceType=VMX"
 	targettype := "--targetType=OVF"
 
