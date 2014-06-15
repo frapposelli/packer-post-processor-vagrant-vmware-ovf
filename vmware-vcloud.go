@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/mitchellh/packer/packer"
 	vmwcommon "github.com/mitchellh/packer/builder/vmware/common"
+	"github.com/mitchellh/packer/packer"
 	"io/ioutil"
 	"os"
 	"os/exec"
