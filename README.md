@@ -8,7 +8,7 @@ This plugin is used to build the boxes available at https://vagrantcloud.com/gos
 
 Software:
 
-  * VMware OVF Tool (```ovftool``` must be in your $PATH)
+  * VMware OVF Tool
   
 Notes:
 
@@ -44,3 +44,5 @@ In your JSON template add the following post processor:
 ```
 
 You can change ```provider``` to ```vcloud``` to make it compatible with [vagrant-vcloud](https://github.com/frapposelli/vagrant-vcloud).
+
+If you don't want to compile the code, you can [grab a release here](https://github.com/gosddc/packer-post-processor-vagrant-vmware-ovf/releases).
