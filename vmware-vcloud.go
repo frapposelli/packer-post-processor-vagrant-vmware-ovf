@@ -81,8 +81,13 @@ func (p *VMwarevCloudProvider) Process(ui packer.Ui, artifact packer.Artifact, d
 
 	ui.Message(fmt.Sprintf("Starting ovftool"))
 
-	cmd.Start()
-	cmd.Wait()
+	out, _, err := RunAndLog(cmd)
+	if err != nil {
+		err = fmt.Errorf("Failed: %s\nStdout: %s", err, out)
+		return
+	}
+
+	ui.Message(fmt.Sprintf("%s", out))
 
 	ui.Message(fmt.Sprintf("Reading files in %s", basepath))
 	files, _ := ioutil.ReadDir(basepath)
