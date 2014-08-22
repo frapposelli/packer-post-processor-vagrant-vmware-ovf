@@ -212,6 +212,8 @@ func providerForName(name string) Provider {
 		return new(VMwarevCloudProvider)
 	case "vcenter":
 		return new(VMwarevCenterProvider)
+	case "vmware_ovf":
+		return new(VMwareOVFProvider)
 	default:
 		return nil
 	}
