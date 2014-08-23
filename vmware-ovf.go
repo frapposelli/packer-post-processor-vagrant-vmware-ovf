@@ -61,15 +61,9 @@ func (p *VMwareOVFProvider) Process(ui packer.Ui, artifact packer.Artifact, dir 
 		ui.Message(fmt.Sprintf("err: %s", err))
 	}
 
-	// start upload
-	ui.Message(fmt.Sprintf("ovftool is going create an ovf out of %s", vmx))
-
 	program, err := FindOvfTool()
 	sourcetype := "--sourceType=VMX"
 	targettype := "--targetType=OVF"
-
-	// start upload
-	ui.Message(fmt.Sprintf("this is our ovftool run %s %s %s %s %s", program, sourcetype, targettype, vmx, basepath+"/"+ovf))
 
 	ui.Message(fmt.Sprintf("Creating directory: %s", basepath))
 
@@ -81,22 +75,12 @@ func (p *VMwareOVFProvider) Process(ui packer.Ui, artifact packer.Artifact, dir 
 
 	ui.Message(fmt.Sprintf("Starting ovftool"))
 
-	out, _, err := RunAndLog(cmd)
-	if err != nil {
-		err = fmt.Errorf("Failed: %s\nStdout: %s", err, out)
-		return
-	}
-
-	ui.Message(fmt.Sprintf("%s", out))
+	cmd.Start()
+	cmd.Wait()
 
 	ui.Message(fmt.Sprintf("Reading files in %s", basepath))
 	files, _ := ioutil.ReadDir(basepath)
 	for _, path := range files {
-		//         ui.Message(fmt.Sprintf("%s", f.Name()))
-		// }
-
-		// Copy all of the original contents into the temporary directory
-		// for _, path := range artifact.Files() {
 		ui.Message(fmt.Sprintf("Copying: %s", path.Name()))
 
 		dstPath := filepath.Join(dir, path.Name())
