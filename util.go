@@ -2,7 +2,6 @@ package main
 
 import (
 	"archive/tar"
-	"bytes"
 	"compress/flate"
 	"compress/gzip"
 	"encoding/json"
@@ -128,31 +127,31 @@ func WriteMetadata(dir string, contents interface{}) error {
 	return enc.Encode(contents)
 }
 
-func RunAndLog(cmd *exec.Cmd) (string, string, error) {
-	var stdout, stderr bytes.Buffer
+// func RunAndLog(cmd *exec.Cmd) (string, string, error) {
+// 	var stdout, stderr bytes.Buffer
 
-	log.Printf("Executing: %s %v", cmd.Path, cmd.Args[1:])
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	err := cmd.Run()
+// 	log.Printf("Executing: %s %v", cmd.Path, cmd.Args[1:])
+// 	cmd.Stdout = &stdout
+// 	cmd.Stderr = &stderr
+// 	err := cmd.Run()
 
-	stdoutString := strings.TrimSpace(stdout.String())
-	stderrString := strings.TrimSpace(stderr.String())
+// 	stdoutString := strings.TrimSpace(stdout.String())
+// 	stderrString := strings.TrimSpace(stderr.String())
 
-	if _, ok := err.(*exec.ExitError); ok {
-		err = fmt.Errorf("VMware error: %s", stderrString)
-	}
+// 	if _, ok := err.(*exec.ExitError); ok {
+// 		err = fmt.Errorf("VMware error: %s", stderrString)
+// 	}
 
-	log.Printf("stdout: %s", stdoutString)
-	log.Printf("stderr: %s", stderrString)
+// 	log.Printf("stdout: %s", stdoutString)
+// 	log.Printf("stderr: %s", stderrString)
 
-	// Replace these for Windows, we only want to deal with Unix
-	// style line endings.
-	returnStdout := strings.Replace(stdout.String(), "\r\n", "\n", -1)
-	returnStderr := strings.Replace(stderr.String(), "\r\n", "\n", -1)
+// 	// Replace these for Windows, we only want to deal with Unix
+// 	// style line endings.
+// 	returnStdout := strings.Replace(stdout.String(), "\r\n", "\n", -1)
+// 	returnStderr := strings.Replace(stderr.String(), "\r\n", "\n", -1)
 
-	return returnStdout, returnStderr, err
-}
+// 	return returnStdout, returnStderr, err
+// }
 
 func FindOvfTool() (ovftool string, err error) {
 	// Accumulate any errors

@@ -79,6 +79,13 @@ func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (pac
 		}
 	}
 
+	switch name {
+	case "vcloud":
+	case "vcenter":
+	default:
+		name = "vmware_ovf"
+	}
+
 	ui.Say(fmt.Sprintf("Creating Vagrant box for '%s' provider", name))
 
 	outputPath, err := config.tpl.Process(config.OutputPath, &outputPathTemplate{
@@ -213,7 +220,7 @@ func providerForName(name string) Provider {
 	case "vcenter":
 		return new(VMwarevCenterProvider)
 	default:
-		return nil
+		return new(VMwareOVFProvider)
 	}
 }
 

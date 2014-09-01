@@ -11,15 +11,15 @@ import (
 	"strings"
 )
 
-type VMwarevCloudProvider struct{}
+type VMwareOVFProvider struct{}
 
-func (p *VMwarevCloudProvider) KeepInputArtifact() bool {
+func (p *VMwareOVFProvider) KeepInputArtifact() bool {
 	return false
 }
 
-func (p *VMwarevCloudProvider) Process(ui packer.Ui, artifact packer.Artifact, dir string) (vagrantfile string, metadata map[string]interface{}, err error) {
+func (p *VMwareOVFProvider) Process(ui packer.Ui, artifact packer.Artifact, dir string) (vagrantfile string, metadata map[string]interface{}, err error) {
 	// Create the metadata
-	metadata = map[string]interface{}{"provider": "vcloud"}
+	metadata = map[string]interface{}{"provider": "vmware_ovf"}
 
 	vmx := ""
 	ovf := ""
