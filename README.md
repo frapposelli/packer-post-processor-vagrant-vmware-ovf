@@ -1,6 +1,6 @@
 # packer-post-processor-vagrant-vmware-ovf
 
-This packer plugin leverages [VMware OVF Tool](http://www.vmware.com/support/developer/ovf) to create a ```vmware_ovf``` Vagrant box that is compatible with [vagrant-vcloud](https://github.com/frapposelli/vagrant-vcloud), [vagrant-vcenter](https://github.com/gosddc/vagrant-vcenter) and [vagrant-vcloudair](https://github.com/gosddc/vagrant-vcloudair), you can find a detailed explanation of the format [here on the wiki](LINKMISSING).
+This packer plugin leverages [VMware OVF Tool](http://www.vmware.com/support/developer/ovf) to create a ```vmware_ovf``` Vagrant box that is compatible with [vagrant-vcloud](https://github.com/frapposelli/vagrant-vcloud), [vagrant-vcenter](https://github.com/gosddc/vagrant-vcenter) and [vagrant-vcloudair](https://github.com/gosddc/vagrant-vcloudair), you can find a detailed explanation of the format [here on the wiki](https://github.com/gosddc/packer-post-processor-vagrant-vmware-ovf/wiki/vmware_ovf-Box-Format).
 
 This plugin is used to build the boxes available at https://vagrantcloud.com/gosddc you can find the [packer templates here](https://github.com/gosddc/packer-templates)
 
