@@ -12,6 +12,11 @@ endif
 
 all: 
 	@$(ECHO) "$(OK_COLOR)==> Building$(NO_COLOR)"
+	go get -v ./...
+	go test -v
+
+bin: 
+	@$(ECHO) "$(OK_COLOR)==> Building$(NO_COLOR)"
 	go build
 
 clean:
