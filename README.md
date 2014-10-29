@@ -16,19 +16,7 @@ Notes:
 
 ## Installation
 
-Add
-
-```json
-{
-  "post-processors": {
-    "vagrant-vmware-ovf": "packer-post-processor-vagrant-vmware-ovf"
-  }
-}
-```
-
-to your packer configuration (see: http://www.packer.io/docs/other/core-configuration.html -> Core Configuration)
-
-Make sure that the directory which contains the packer-post-processor-vagrant-vmware-ovf executable is your PATH environmental variable (see http://www.packer.io/docs/extend/plugins.html -> Installing Plugins)
+Starting from Packer v0.7.0 there are new ways of installing plugins, [see the official Packer documentation](http://www.packer.io/docs/extend/plugins.html) for further instructions.
 
 ## Usage
 
