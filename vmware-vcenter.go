@@ -42,7 +42,11 @@ func (p *VMwarevCenterProvider) Process(ui packer.Ui, artifact packer.Artifact, 
 			ui.Message(fmt.Sprintf("Deleting key: %s", k))
 			delete(vmxData, k)
 		}
-		if strings.HasPrefix(k, "ide1:0.file") {
+		if strings.HasPrefix(k, "ide1:0.") {
+			ui.Message(fmt.Sprintf("Deleting key: %s", k))
+			delete(vmxData, k)
+		}
+		if strings.HasPrefix(k, "ide1:1.") {
 			ui.Message(fmt.Sprintf("Deleting key: %s", k))
 			delete(vmxData, k)
 		}
