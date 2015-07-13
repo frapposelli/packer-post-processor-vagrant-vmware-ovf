@@ -64,7 +64,7 @@ func (p *PostProcessor) PostProcessProvider(name string, provider Provider, ui p
 	if specificConfig, ok := p.configs[name]; ok {
 		config = specificConfig
 	}
-	
+
 	// Optional provider config to set eg. vcloud
 	if config.Provider != "" {
 		name = config.Provider
