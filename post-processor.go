@@ -8,8 +8,11 @@ import (
 	"path/filepath"
 	"text/template"
 
+	"github.com/mitchellh/mapstructure"
 	"github.com/mitchellh/packer/common"
+	"github.com/mitchellh/packer/helper/config"
 	"github.com/mitchellh/packer/packer"
+	"github.com/mitchellh/packer/template/interpolate"
 )
 
 var builtins = map[string]string{
@@ -26,7 +29,7 @@ type Config struct {
 	VagrantfileTemplate string `mapstructure:"vagrantfile_template"`
 	Provider            string `mapstructure:"provider"`
 
-	tpl *packer.ConfigTemplate
+	ctx interpolate.Context
 }
 
 type PostProcessor struct {
@@ -56,20 +59,12 @@ func (p *PostProcessor) Configure(raws ...interface{}) error {
 	return nil
 }
 
-func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (packer.Artifact, bool, error) {
-	name, ok := builtins[artifact.BuilderId()]
-	if !ok {
-		return nil, false, fmt.Errorf(
-			"Unknown artifact type, can't build box: %s", artifact.BuilderId())
-	}
-
-	provider := providerForName(name)
-
+func (p *PostProcessor) PostProcessProvider(name string, provider Provider, ui packer.Ui, artifact packer.Artifact) (packer.Artifact, bool, error) {
 	config := p.configs[""]
 	if specificConfig, ok := p.configs[name]; ok {
 		config = specificConfig
 	}
-
+	
 	// Optional provider config to set eg. vcloud
 	if config.Provider != "" {
 		name = config.Provider
@@ -88,11 +83,12 @@ func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (pac
 
 	ui.Say(fmt.Sprintf("Creating Vagrant box for '%s' provider", name))
 
-	outputPath, err := config.tpl.Process(config.OutputPath, &outputPathTemplate{
+	config.ctx.Data = &outputPathTemplate{
 		ArtifactId: artifact.Id(),
 		BuildName:  config.PackerBuildName,
 		Provider:   name,
-	})
+	}
+	outputPath, err := interpolate.Render(config.OutputPath, &config.ctx)
 	if err != nil {
 		return nil, false, err
 	}
@@ -128,8 +124,7 @@ func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (pac
 	// Write our Vagrantfile
 	var customVagrantfile string
 	if config.VagrantfileTemplate != "" {
-		ui.Message(fmt.Sprintf(
-			"Using custom Vagrantfile: %s", config.VagrantfileTemplate))
+		ui.Message(fmt.Sprintf("Using custom Vagrantfile: %s", config.VagrantfileTemplate))
 		customBytes, err := ioutil.ReadFile(config.VagrantfileTemplate)
 		if err != nil {
 			return nil, false, err
@@ -161,21 +156,42 @@ func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (pac
 	return NewArtifact(name, outputPath), provider.KeepInputArtifact(), nil
 }
 
-func (p *PostProcessor) configureSingle(config *Config, raws ...interface{}) error {
-	md, err := common.DecodeConfig(config, raws...)
-	if err != nil {
-		return err
+func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (packer.Artifact, bool, error) {
+
+	name, ok := builtins[artifact.BuilderId()]
+	if !ok {
+		return nil, false, fmt.Errorf(
+			"Unknown artifact type, can't build box: %s", artifact.BuilderId())
 	}
 
-	config.tpl, err = packer.NewConfigTemplate()
+	provider := providerForName(name)
+	if provider == nil {
+		// This shouldn't happen since we hard code all of these ourselves
+		panic(fmt.Sprintf("bad provider name: %s", name))
+	}
+
+	return p.PostProcessProvider(name, provider, ui, artifact)
+}
+
+func (p *PostProcessor) configureSingle(c *Config, raws ...interface{}) error {
+	var md mapstructure.Metadata
+	err := config.Decode(c, &config.DecodeOpts{
+		Metadata:           &md,
+		Interpolate:        true,
+		InterpolateContext: &c.ctx,
+		InterpolateFilter: &interpolate.RenderFilter{
+			Exclude: []string{
+				"output",
+			},
+		},
+	}, raws...)
 	if err != nil {
 		return err
 	}
-	config.tpl.UserVars = config.PackerUserVars
 
 	// Defaults
-	if config.OutputPath == "" {
-		config.OutputPath = "packer_{{ .BuildName }}_{{.Provider}}.box"
+	if c.OutputPath == "" {
+		c.OutputPath = "packer_{{ .BuildName }}_{{.Provider}}.box"
 	}
 
 	found := false
@@ -187,22 +203,15 @@ func (p *PostProcessor) configureSingle(config *Config, raws ...interface{}) err
 	}
 
 	if !found {
-		config.CompressionLevel = flate.DefaultCompression
+		c.CompressionLevel = flate.DefaultCompression
 	}
 
-	// Accumulate any errors
-	errs := common.CheckUnusedConfig(md)
-
-	validates := map[string]*string{
-		"output":               &config.OutputPath,
-		"vagrantfile_template": &config.VagrantfileTemplate,
-		"provider":             &config.Provider,
-	}
-
-	for n, ptr := range validates {
-		if err := config.tpl.Validate(*ptr); err != nil {
-			errs = packer.MultiErrorAppend(
-				errs, fmt.Errorf("Error parsing %s: %s", n, err))
+	var errs *packer.MultiError
+	if c.VagrantfileTemplate != "" {
+		_, err := os.Stat(c.VagrantfileTemplate)
+		if err != nil {
+			errs = packer.MultiErrorAppend(errs, fmt.Errorf(
+				"vagrantfile_template '%s' does not exist", c.VagrantfileTemplate))
 		}
 	}
 
