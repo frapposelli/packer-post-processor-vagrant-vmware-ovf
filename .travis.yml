@@ -1,1 +1,6 @@
 language: go
+notifications:
+  webhooks: 
+    urls:
+      - secure: "jWI4HsOrU8nKiYZNuoU8yuTqIUtqh4mPG8trO3Vgd2KkTFvSrQT65kIlXnm1Fv5OAPY0z7KqyZrySoLvyjfdxbze5O1jw0Pkvw7fGtAUha+MpveD+UPLM1Bh4GFyAOLyjZfXYv3I3DqmLkiQdYBF1eY2omynR+GHn0VVcm9xARY="
+    on_start: true
