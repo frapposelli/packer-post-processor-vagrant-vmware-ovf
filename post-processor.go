@@ -8,11 +8,11 @@ import (
 	"path/filepath"
 	"text/template"
 
+	"github.com/hashicorp/packer/common"
+	"github.com/hashicorp/packer/helper/config"
+	"github.com/hashicorp/packer/packer"
+	"github.com/hashicorp/packer/template/interpolate"
 	"github.com/mitchellh/mapstructure"
-	"github.com/mitchellh/packer/common"
-	"github.com/mitchellh/packer/helper/config"
-	"github.com/mitchellh/packer/packer"
-	"github.com/mitchellh/packer/template/interpolate"
 )
 
 var builtins = map[string]string{
@@ -104,7 +104,7 @@ func (p *PostProcessor) PostProcessProvider(name string, provider Provider, ui p
 	for _, src := range config.Include {
 		ui.Message(fmt.Sprintf("Copying from include: %s", src))
 		dst := filepath.Join(dir, filepath.Base(src))
-		if err := CopyContents(dst, src); err != nil {
+		if err = CopyContents(dst, src); err != nil {
 			err = fmt.Errorf("Error copying include file: %s\n\n%s", src, err)
 			return nil, false, err
 		}
@@ -117,7 +117,7 @@ func (p *PostProcessor) PostProcessProvider(name string, provider Provider, ui p
 	}
 
 	// Write the metadata we got
-	if err := WriteMetadata(dir, metadata); err != nil {
+	if err = WriteMetadata(dir, metadata); err != nil {
 		return nil, false, err
 	}
 

@@ -6,13 +6,14 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
-	"github.com/mitchellh/packer/packer"
 	"io"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/hashicorp/packer/packer"
 )
 
 // Copies a file by copying the contents of the file to another place.

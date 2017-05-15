@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/mitchellh/packer/packer/plugin"
+	"github.com/hashicorp/packer/packer/plugin"
 )
 
 func main() {
